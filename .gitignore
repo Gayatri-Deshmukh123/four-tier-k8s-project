@@ -1,6 +1,17 @@
+# Environment files and credentials
 .env
+.env.*
+!.env.example
 *.pem
 *.key
+
+# Dependencies
+node_modules/
+
+# Kubernetes secrets
+k8s/secrets.yaml
+**/secrets.yaml
+
+# Database backups and dumps
 *.sql
 restored.sql
-node_modules/
