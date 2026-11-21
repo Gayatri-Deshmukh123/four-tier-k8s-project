@@ -1,0 +1,45 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mariadb-backup
+  namespace: student-project
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: mariadb:11.4
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  DATE=$(date +%Y%m%d-%H%M%S)
+                  mariadb-dump \
+                    -h db-primary \
+                    -u root \
+                    -p"$MYSQL_ROOT_PASSWORD" \
+                    --single-transaction \
+                    studentdb > /backup/studentdb-$DATE.sql
+
+                  find /backup -type f -name "*.sql" -mtime +3 -delete
+
+                  echo "Backup completed: $DATE"
+              env:
+                - name: MYSQL_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: student-db-secret
+                      key: MYSQL_ROOT_PASSWORD
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backup
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: db-backup-pvc

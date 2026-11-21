@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-replica
+  namespace: student-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-replica
+  template:
+    metadata:
+      labels:
+        app: db-replica
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:11
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: student-db-secret
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - name: replica-storage
+              mountPath: /var/lib/mysql
+            - name: replica-config
+              mountPath: /etc/mysql/conf.d/replica.cnf
+              subPath: replica.cnf
+      volumes:
+         - name: replica-storage
+           persistentVolumeClaim:
+            claimName: db-replica-pvc
+         - name: replica-config
+           configMap:
+            name: replica-config
+
+
+

@@ -1,0 +1,14 @@
+{
+  "name": "student-backend",
+  "version": "1.0.0",
+  "description": "Student API with Redis caching and MariaDB",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.14.0",
+    "redis": "^4.7.0"
+  }
+}

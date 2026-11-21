@@ -1,0 +1,6 @@
+.env
+*.pem
+*.key
+*.sql
+restored.sql
+node_modules/
